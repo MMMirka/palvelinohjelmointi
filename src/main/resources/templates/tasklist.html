@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+
+
+<title>Tasklist</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+</head>
+<body>
+	<div class="container">
+	<div class="col-md-4">
+		<h1>Tasklist</h1>
+	</div>
+	<div class="col-md-4">
+		<h3 th:inline="text">Welcome [[${#httpServletRequest.remoteUser}]]</h3>
+	</div>
+	<div class="col-md-4" style="padding:20px 0">
+		<form th:action="@{/logout}" method="post">
+			<input type="submit" value="Sign Out" class="btn btn-sm btn-danger"/>
+		</form>
+	</div>
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>Task</th>
+				<th>Worker</th>
+				<th>DL</th>
+				<th>Priority</th>
+				<th sec:authorize="hasAuthority('ADMIN')"> </th>
+			</tr>
+		</thead>
+
+
+		<tbody>
+			<tr th:each="task : ${tasks}">
+				
+				<td th:text="${task.todo}"></td>
+				<td th:text="${task.worker}"></td>
+				<td th:text="${task.dl}"></td>
+				<td th:text="${task.priority.name}"></td> 
+				
+
+				
+				<td sec:authorize="hasAuthority('ADMIN')">
+				<a th:href="@{/delete/{id}(id=${task.id})}"
+				 class="btn btn-xs btn-danger">Delete</a></td>
+				<td><a class="btn btn-primary"
+					th:href="@{/edit/{id}(id=${task.id})}">Edit</a></td>
+			</tr>
+		</tbody>
+	</table>
+
+
+	<a class="btn btn-success" href="/add">Add task</a>
+	</div>
+</body>
+</html>
