@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 
 @Entity
-@Table(name="usertable")
+@Table(name="userstable")
 public class User {
 	
 
@@ -13,7 +13,7 @@ public class User {
     @Column(name = "id", nullable = false, updatable = false)
     private Long id;
 
-    // Username with unique constraint
+    // unique username 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
@@ -23,14 +23,21 @@ public class User {
     @Column(name = "role", nullable = false)
     private String role;
     
+	 @Column(name = "email", nullable = false, unique = true)
+	 private String email;
+    
+	 @Column (name = "resetpasswordtoken")
+	 private String resetPasswordToken;
+    
     public User() {
     }
 
-	public User(String username, String passwordHash, String role) {
+	public User(String username, String passwordHash, String role, String email) {
 		super();
 		this.username = username;
 		this.passwordHash = passwordHash;
 		this.role = role;
+		this.email = email;
 	}
 
 	public Long getId() {
@@ -63,6 +70,21 @@ public class User {
 
 	public void setRole(String role) {
 		this.role = role;
+	}
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getResetPasswordToken() {
+		return resetPasswordToken;
+	}
+
+	public void setResetPasswordToken(String resetPasswordToken) {
+		this.resetPasswordToken = resetPasswordToken;
 	}
 
 }

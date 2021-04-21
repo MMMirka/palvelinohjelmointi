@@ -1,6 +1,7 @@
 package MirkaM.TaskList.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,23 +23,16 @@ public class UserController {
     private UserRepository urepository; 
 	
     @RequestMapping(value = "signup")
-    public String addStudent(Model model){
+    public String addUser(Model model){
     	model.addAttribute("signupform", new SignupForm());
         return "signup";
     }	
     
-    /**
-     * Create new user
-     * Check if user already exists & form validation
-     * 
-     * @param signupForm
-     * @param bindingResult
-     * @return
-     */
+  // New user
     @RequestMapping(value = "saveuser", method = RequestMethod.POST)
     public String save(@Valid @ModelAttribute("signupform") SignupForm signupForm, BindingResult bindingResult) {
-    	if (!bindingResult.hasErrors()) { // validation errors
-    		if (signupForm.getPassword().equals(signupForm.getPasswordCheck())) { // check password match		
+    	if (!bindingResult.hasErrors()) { 
+    		if (signupForm.getPassword().equals(signupForm.getPasswordCheck())) { // check if password match		
 	    		String pwd = signupForm.getPassword();
 		    	BCryptPasswordEncoder bc = new BCryptPasswordEncoder();
 		    	String hashPwd = bc.encode(pwd);
@@ -47,13 +41,26 @@ public class UserController {
 		    	newUser.setPasswordHash(hashPwd);
 		    	newUser.setUsername(signupForm.getUsername());
 		    	newUser.setRole("USER");
+		    	newUser.setEmail(signupForm.getEmail());
+		    	
 		    	if (urepository.findByUsername(signupForm.getUsername()) == null) { // Check if user exists
 		    		urepository.save(newUser);
+		    	
+	    			if(urepository.findByEmail(signupForm.getEmail()) == null) {
+	    				urepository.save(newUser);
+	    			}
+		    		else {
+		    			bindingResult.rejectValue("email", "err.email", "Email already in use");    	
+		    			return "signup";
+		    		
+		    		}
 		    	}
+		    	
 		    	else {
 	    			bindingResult.rejectValue("username", "err.username", "Username already exists");    	
 	    			return "signup";		    		
 		    	}
+		    	
     		}
     		else {
     			bindingResult.rejectValue("passwordCheck", "err.passCheck", "Passwords does not match");    	
@@ -64,6 +71,34 @@ public class UserController {
     		return "signup";
     	}
     	return "redirect:/login";    	
-    }    
+    } 
     
+    //Reset password
+    public void updateResetPasswordToken(String token, String email) throws UsernameNotFoundException {
+        User user = urepository.findByEmail(email);
+        if (user != null) {
+            user.setResetPasswordToken(token);
+            urepository.save(user);
+        } else {
+            throw new UsernameNotFoundException("Could not find any user with the email " + email);
+        }
+    }
+     
+    public User getByResetPasswordToken(String token) {
+        return urepository.findByResetPasswordToken(token);
+    }
+     
+    public void updatePassword(User user, String newPassword) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.setPasswordHash(encodedPassword);
+         
+        user.setResetPasswordToken(null);
+        urepository.save(user);
+    }
+    
+  
 }
+
+    
+

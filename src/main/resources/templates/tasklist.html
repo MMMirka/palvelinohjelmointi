@@ -37,7 +37,7 @@
 			<tr th:each="task : ${tasks}">
 				
 				<td th:text="${task.todo}"></td>
-				<td th:text="${task.worker}"></td>
+				<td th:text="${task.user.username}"></td>
 				<td th:text="${task.dl}"></td>
 				<td th:text="${task.priority.name}"></td> 
 				

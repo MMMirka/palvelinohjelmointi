@@ -17,21 +17,26 @@ public class Task {
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private long id;
-	private String todo, worker, dl;
+	private String todo, dl;
 	
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "priorityid")
     private Priority priority;
     
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "username")
+    private User user;
+    
     
 	public Task () {}
 	
 	
-	public Task(String todo, String worker, String dl, Priority priority) {
+	public Task(String todo, User user, String dl, Priority priority) {
 		super();
 		this.todo = todo;
-		this.worker = worker;
+		this.user = user;
 		this.dl = dl;
 		this.priority = priority;
 		
@@ -59,13 +64,13 @@ public class Task {
 	}
 
 
-	public String getWorker() {
-		return worker;
+	public User getUser() {
+		return user;
 	}
 
 
-	public void setWorker(String worker) {
-		this.worker = worker;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 
@@ -94,7 +99,7 @@ public class Task {
 
 	@Override
 	public String toString() {
-		return "Task [id=" + id + ", todo=" + todo + ", worker=" + worker + ", dl=" + dl + ", priority=" + priority
+		return "Task [id=" + id + ", todo=" + todo + ", User=" + user + ", dl=" + dl + ", priority=" + priority
 				+ "]";
 	}}
 
